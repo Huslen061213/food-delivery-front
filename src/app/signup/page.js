@@ -11,6 +11,7 @@ import axios from "axios";
 const Home = () => {
   const [step, setStep] = useState(1);
   const router = useRouter();
+  const [apiError, setApiError] = useState("");
   const validationSchema = Yup.object().shape({
     email: Yup.string()
       .email("Please enter a valid email address (m@example.com)")
@@ -30,10 +31,12 @@ const Home = () => {
     try {
       const responce = await axios.post(
         "http://localhost:999/authentication/signup",
-        { email: "test", password: "123" }
+        { email: email, password: password }
       );
+      router.push("/login");
     } catch (err) {
-      console.log(err);
+      console.log(err, "this is");
+      //  setApiError(true)
     } finally {
       console.log("finished");
     }
@@ -47,9 +50,9 @@ const Home = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values, "values");
-      await createUser();
-      //   router.push("/login");
+      const { email, password } = values;
+
+      await createUser(email, password);
     },
   });
   function next() {

@@ -1,8 +1,23 @@
 import React, { useState } from "react";
 import { Plus, Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 export const FooodMenu = () => {
   const [activeCategory, setActiveCategory] = useState("All Dishes");
+  const [openAddCategory, setOpenAddCategory] = useState(false);
+  const [openAddDish, setOpenAddDish] = useState(false);
 
   const categories = [
     { name: "All Dishes", count: 112 },
@@ -105,11 +120,82 @@ export const FooodMenu = () => {
   };
 
   const displayDishes = getCategoryDishes(activeCategory);
+  const AddCategory = () => {};
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen  bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Dishes Category */}
+        <Dialog open={openAddDish} onOpenChange={setOpenAddDish}>
+          <form>
+            <DialogContent className="sm:max-w-[460px] h-[592px]">
+              <DialogHeader>
+                <DialogTitle>Add new Dish to Appetizers</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="flex gap-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="name-1">Food name</Label>
+                    <Input
+                      className="w-[194px] h-[38px]"
+                      id="name-1"
+                      name="name"
+                      placeholder="Type food name"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="username-1">Food price</Label>
+                    <Input
+                      className="w-[194px] h-[38px]"
+                      id="price"
+                      name="price"
+                      placeholder="Enter price..."
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label>Ingredients</Label>
+                  <Input
+                    className="w-[412px] h-[90px]"
+                    id="ingredients"
+                    name="ingredients"
+                    placeholder="List ingredients..."
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label>Food image</Label>
+                  <Input type="file" name="foodimage" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit">Add dish</Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
+        <Dialog open={openAddCategory} onOpenChange={setOpenAddCategory}>
+          <form>
+            <DialogContent className="sm:max-w-[460px] h-[272px]">
+              <DialogHeader>
+                <DialogTitle>Add new Category</DialogTitle>
+              </DialogHeader>
+
+              <div className="grid gap-2">
+                <Label>Category name</Label>
+                <Input
+                  className="w-[412px] h-[38px]"
+                  id="ingredients"
+                  name="ingredients"
+                  placeholder="Type category name..."
+                />
+              </div>
+
+              <DialogFooter>
+                <Button type="submit">Add dish</Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
+        ) ;{/* Dishes Category */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h2 className="text-2xl font-bold mb-6  pb-2 ">Dishes category</h2>
 
@@ -137,7 +223,11 @@ export const FooodMenu = () => {
                 </span>
               </button>
             ))}
-            <button className="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition">
+
+            <button
+              onClick={() => setOpenAddCategory(true)}
+              className="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition"
+            >
               <Plus className="w-5 h-5" />
             </button>
           </div>
@@ -150,7 +240,10 @@ export const FooodMenu = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Add New Dish Card */}
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px] hover:border-red-400 transition cursor-pointer">
+              <div
+                onClick={() => setOpenAddDish(true)}
+                className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px] hover:border-red-400 transition cursor-pointer"
+              >
                 <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center mb-4">
                   <Plus className="w-8 h-8" />
                 </div>

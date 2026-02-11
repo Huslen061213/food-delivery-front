@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useFormik } from "formik";
 import { ChevronLeftIcon } from "../icons/ChevronLeftIcon";
 import { useRouter } from "next/navigation";
 
@@ -7,6 +8,8 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const { values, handleChange, handleBlur, errors, touched, handleSubmit } =
+    formik;
   const handleClickSignUpButton = () => {
     router.push("/signup");
   };
@@ -22,6 +25,19 @@ export default function Login() {
       setError;
     }
   };
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      const { email, password } = values;
+
+      await getUser(email, password);
+    },
+  });
 
   const handleEmail = (value) => {
     setEmail(value);
@@ -72,12 +88,13 @@ export default function Login() {
             className={`flex justify-center items-center rounded-md w-full h-9 text-white ${
               !email || error ? "bg-gray-200" : "bg-[#18181B]"
             }`}
+            onClick={handleSubmit}
           >
             Let&apos;s Go
           </button>
 
           <div className="flex gap-3">
-            <p className="text-[#71717A]">Already have an account</p>
+            <p className="text-[#71717A]">Don’t have an account?</p>
             <p className="text-[#2563EB]" onClick={handleClickSignUpButton}>
               Sign up
             </p>

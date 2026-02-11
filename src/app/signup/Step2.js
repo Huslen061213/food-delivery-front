@@ -5,6 +5,12 @@ import { ChevronLeftIcon } from "../icons/ChevronLeftIcon";
 import { useRouter } from "next/navigation";
 
 export default function Step2({ next, back, formik }) {
+  const router = useRouter();
+  const { values, handleChange, handleBlur, errors, touched, handleSubmit } =
+    formik;
+  const handleClickLogin = () => {
+    router.push("/login");
+  };
   return (
     <div className="flex justify-around w-full h-full">
       <div className="flex justify-center items-center w-[416px]">
@@ -72,13 +78,19 @@ export default function Step2({ next, back, formik }) {
                 : "bg-gray-200 cursor-not-allowed"
             }`}
             disabled={!formik.isValid}
+            onClick={handleSubmit}
           >
             Let&apos;s Go
           </button>
 
           <div className="flex gap-3">
             <p className="text-[#71717A]">Already have an account</p>
-            <p className="text-[#2563EB] cursor-pointer">Log in</p>
+            <p
+              className="text-[#2563EB] cursor-pointer"
+              onClick={handleClickLogin}
+            >
+              Log in
+            </p>
           </div>
         </form>
       </div>
