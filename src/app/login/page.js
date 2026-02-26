@@ -1,12 +1,12 @@
 "use client";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useFormik } from "formik";
 import { ChevronLeftIcon } from "../icons/ChevronLeftIcon";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Yup from "yup";
 import axios from "axios";
 
-export default function Login() {
+function LoginContent() {
   const [apiError, setApiError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -155,5 +155,13 @@ export default function Login() {
         <div className="bg-[url(/LogInBg.png)] rounded-md w-214 h-226"></div>
       </div>
     </div>
+  );
+}
+
+export default function Login() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }
