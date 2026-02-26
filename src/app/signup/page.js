@@ -4,13 +4,15 @@ import { useState } from "react";
 import Step1 from "./Step1";
 import Step2 from "./Step2";
 import { useFormik } from "formik";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as Yup from "yup";
 import axios from "axios";
 
 const Home = () => {
   const [step, setStep] = useState(1);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/homepage";
   const [apiError, setApiError] = useState("");
   const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -29,11 +31,13 @@ const Home = () => {
 
   const createUser = async (email, password) => {
     try {
-      const responce = await axios.post(
+      await axios.post(
         "http://localhost:999/authentication/signup",
         { email: email, password: password }
       );
-      router.push("/login");
+      router.push(
+        `/login?next=${encodeURIComponent(nextPath)}&email=${encodeURIComponent(email)}`
+      );
     } catch (err) {
       console.log(err, "this is");
       //  setApiError(true)

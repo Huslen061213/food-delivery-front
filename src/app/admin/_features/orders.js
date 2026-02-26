@@ -1,50 +1,63 @@
 "use client";
-import React, { useState } from "react";
-import { ChevronDown, Calendar } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { getAdminOrders, subscribeOrderCartStore } from "@/lib/orderCartStore";
+
+const sampleOrders = [
+  {
+    id: 1,
+    selected: true,
+    customer: "Amgalan",
+    food: "2 foods",
+    date: "2024/12/20",
+    total: "$26.97",
+    address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
+    status: "Pending",
+  },
+  {
+    id: 2,
+    selected: true,
+    customer: "Test@gmail.com",
+    food: "2 foods",
+    date: "2024/12/20",
+    total: "$26.97",
+    address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
+    status: "Pending",
+  },
+  {
+    id: 3,
+    selected: true,
+    customer: "Test@gmail.com",
+    food: "2 foods",
+    date: "2024/12/20",
+    total: "$26.97",
+    address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
+    status: "Pending",
+  },
+  {
+    id: 4,
+    selected: false,
+    customer: "Test@gmail.com",
+    food: "2 foods",
+    date: "2024/12/20",
+    total: "$26.97",
+    address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
+    status: "Delivered",
+  },
+];
 
 export const Order = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      selected: true,
-      customer: "Amgalan",
-      food: "2 foods",
-      date: "2024/12/20",
-      total: "$26.97",
-      address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      selected: true,
-      customer: "Test@gmail.com",
-      food: "2 foods",
-      date: "2024/12/20",
-      total: "$26.97",
-      address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      selected: true,
-      customer: "Test@gmail.com",
-      food: "2 foods",
-      date: "2024/12/20",
-      total: "$26.97",
-      address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
-      status: "Pending",
-    },
-    {
-      id: 4,
-      selected: false,
-      customer: "Test@gmail.com",
-      food: "2 foods",
-      date: "2024/12/20",
-      total: "$26.97",
-      address: "СБД, 12-р хороо, СБД нэгдсэн эмнэлэг...",
-      status: "Delivered",
-    },
-  ]);
+  const [orders, setOrders] = useState(sampleOrders);
+
+  useEffect(() => {
+    const syncOrders = () => {
+      setOrders([...getAdminOrders(), ...sampleOrders]);
+    };
+
+    syncOrders();
+    return subscribeOrderCartStore(syncOrders);
+  }, []);
+
+  const hasOrders = useMemo(() => orders.length > 0, [orders]);
 
   const toggleSelection = (id) => {
     setOrders(
@@ -105,6 +118,13 @@ export const Order = () => {
                   <td className="p-3">{order.status}</td>
                 </tr>
               ))}
+              {!hasOrders && (
+                <tr>
+                  <td colSpan={7} className="p-6 text-center text-gray-500">
+                    No orders yet.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

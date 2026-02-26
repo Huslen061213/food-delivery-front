@@ -1,55 +1,72 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFormik } from "formik";
 import { ChevronLeftIcon } from "../icons/ChevronLeftIcon";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import * as Yup from "yup";
+import axios from "axios";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [apiError, setApiError] = useState("");
   const router = useRouter();
-  const { values, handleChange, handleBlur, errors, touched, handleSubmit } =
-    formik;
-  const handleClickSignUpButton = () => {
-    router.push("/signup");
-  };
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next") || "/homepage";
+  const prefilledEmail = useMemo(() => searchParams.get("email") || "", [searchParams]);
+  const validationSchema = Yup.object().shape({
+    email: Yup.string()
+      .email("Please enter a valid email address (m@example.com)")
+      .required("Required"),
+    password: Yup.string().required("Required"),
+  });
 
-  const loginuser = async (email, password) => {
+  const loginUser = async (email, password) => {
     try {
-      await axios.post("http://localhost:999/authentication/login", {
-        email: email,
-        password: password,
+      setApiError("");
+      const res = await axios.post("http://localhost:999/authentication/login", {
+        email,
+        password,
       });
+      if (typeof window !== "undefined") {
+        const dbEmail = res?.data?.user?.email || email;
+        window.localStorage.setItem("nomnom_user_email", dbEmail);
+        if (res?.data?.user?.address) {
+          const currentCheckout = JSON.parse(
+            window.localStorage.getItem("nomnom_checkout_info") || "{}"
+          );
+          window.localStorage.setItem(
+            "nomnom_checkout_info",
+            JSON.stringify({
+              ...currentCheckout,
+              email: dbEmail,
+              address: res.data.user.address,
+            })
+          );
+        }
+      }
+      router.push(nextPath);
     } catch (err) {
-      setError;
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data ||
+        "Login failed. Please check your email and password.";
+      setApiError(typeof message === "string" ? message : "Login failed.");
     }
   };
 
   const formik = useFormik({
     initialValues: {
-      email: "",
+      email: prefilledEmail,
       password: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
       const { email, password } = values;
-
-      await getUser(email, password);
+      await loginUser(email, password);
     },
+    enableReinitialize: true,
   });
-
-  const handleEmail = (value) => {
-    setEmail(value);
-
-    if (!value) {
-      setError("");
-      return;
-    }
-
-    if (!emailRegex.test(value)) setError("Invalid email.");
-    else setError("");
-  };
+  const { values, handleChange, handleBlur, errors, touched, handleSubmit } =
+    formik;
 
   return (
     <div className="flex justify-around w-full h-full">
@@ -64,38 +81,70 @@ export default function Login() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-5">
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <input
               type="email"
+              name="email"
               placeholder="Enter your email address"
-              value={email}
-              onChange={(e) => handleEmail(e.target.value)}
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
               className={`border rounded-md w-full h-9 px-2 ${
-                error ? "border-red-500" : "border-[#c9c9d3]"
+                touched.email && errors.email
+                  ? "border-red-500"
+                  : "border-[#c9c9d3]"
               }`}
             />
+            {touched.email && errors.email && (
+              <p className="text-sm text-red-500">{errors.email}</p>
+            )}
+
             <input
               type="password"
+              name="password"
               placeholder="Password"
-              className="border rounded-md w-full h-9 px-2 border-[#c9c9d3]"
+              value={values.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              className={`border rounded-md w-full h-9 px-2 ${
+                touched.password && errors.password
+                  ? "border-red-500"
+                  : "border-[#c9c9d3]"
+              }`}
             />
+            {touched.password && errors.password && (
+              <p className="text-sm text-red-500">{errors.password}</p>
+            )}
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
-          </div>
+            {apiError && <p className="text-sm text-red-500">{apiError}</p>}
 
-          <button
-            disabled={!email || error}
-            className={`flex justify-center items-center rounded-md w-full h-9 text-white ${
-              !email || error ? "bg-gray-200" : "bg-[#18181B]"
-            }`}
-            onClick={handleSubmit}
-          >
-            Let&apos;s Go
-          </button>
+            <button
+              type="submit"
+              disabled={
+                !values.email ||
+                !values.password ||
+                Boolean(errors.email) ||
+                Boolean(errors.password)
+              }
+              className={`flex justify-center items-center rounded-md w-full h-9 text-white ${
+                !values.email ||
+                !values.password ||
+                Boolean(errors.email) ||
+                Boolean(errors.password)
+                  ? "bg-gray-200"
+                  : "bg-[#18181B]"
+              }`}
+            >
+              Let&apos;s Go
+            </button>
+          </form>
 
           <div className="flex gap-3">
             <p className="text-[#71717A]">Don’t have an account?</p>
-            <p className="text-[#2563EB]" onClick={handleClickSignUpButton}>
+            <p
+              className="text-[#2563EB]"
+              onClick={() => router.push(`/signup?next=${encodeURIComponent(nextPath)}`)}
+            >
               Sign up
             </p>
           </div>
