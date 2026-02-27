@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import * as Yup from "yup";
 import axios from "axios";
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://food-delivery-back-1-wfja.onrender.com";
+
 function LoginContent() {
   const [apiError, setApiError] = useState("");
   const router = useRouter();
@@ -22,7 +25,7 @@ function LoginContent() {
   const loginUser = async (email, password) => {
     try {
       setApiError("");
-      const res = await axios.post("http://localhost:999/authentication/login", {
+      const res = await axios.post(`${API_BASE_URL}/authentication/login`, {
         email,
         password,
       });

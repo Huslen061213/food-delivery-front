@@ -12,7 +12,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const API_BASE_URL = "http://localhost:999";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://food-delivery-back-1-wfja.onrender.com";
 
 export const FooodMenu = () => {
   const [activeCategory, setActiveCategory] = useState("all");
