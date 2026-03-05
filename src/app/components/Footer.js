@@ -1,5 +1,57 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://food-delivery-back-1-wfja.onrender.com";
+
+const fallbackMenu = [
+  "Appetizers",
+  "Salads",
+  "Pizzas",
+  "Main dishes",
+  "Desserts",
+  "Side dish",
+  "Brunch",
+  "Beverages",
+  "Fish & Sea foods",
+];
+
 export default function Footer() {
+  const [menuCategories, setMenuCategories] = useState([]);
   const marqueeItems = Array.from({ length: 8 }, () => "Fresh fast delivered");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch(`${API_BASE_URL}/foodCategory`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted) return;
+        const next = Array.isArray(data)
+          ? data
+              .map((item) => String(item?.categoryName || "").trim())
+              .filter(Boolean)
+          : [];
+
+        setMenuCategories(next);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setMenuCategories([]);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const effectiveMenu = menuCategories.length > 0 ? menuCategories : fallbackMenu;
+
+  const [menuColumnA, menuColumnB] = useMemo(() => {
+    const mid = Math.ceil(effectiveMenu.length / 2);
+    return [effectiveMenu.slice(0, mid), effectiveMenu.slice(mid)];
+  }, [effectiveMenu]);
 
   return (
     <footer className="bg-[#0B0D12]">
@@ -47,20 +99,16 @@ export default function Footer() {
 
           <div className="space-y-3 text-sm">
             <p className="text-[11px] uppercase tracking-wider text-white/50">Menu</p>
-            <p>Appetizers</p>
-            <p>Salads</p>
-            <p>Pizzas</p>
-            <p>Main dishes</p>
-            <p>Desserts</p>
+            {menuColumnA.map((category) => (
+              <p key={`footer-cat-a-${category}`}>{category}</p>
+            ))}
           </div>
 
           <div className="space-y-3 text-sm">
             <p className="text-[11px] uppercase tracking-wider text-white/50">Menu</p>
-            <p>Side dish</p>
-            <p>Brunch</p>
-            <p>Desserts</p>
-            <p>Beverages</p>
-            <p>Fish &amp; Sea foods</p>
+            {menuColumnB.map((category) => (
+              <p key={`footer-cat-b-${category}`}>{category}</p>
+            ))}
           </div>
 
           <div className="space-y-3 text-sm">

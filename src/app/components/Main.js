@@ -54,6 +54,7 @@ export default function Main() {
   const [activeCategory, setActiveCategory] = useState("All dishes");
   const [categories, setCategories] = useState([]);
   const [dishes, setDishes] = useState([]);
+  const [addedDish, setAddedDish] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -143,6 +144,7 @@ export default function Main() {
 
   const handleAddToCart = (item) => {
     addDishToCart(item);
+    setAddedDish(item);
   };
 
   const visibleSections =
@@ -250,6 +252,48 @@ export default function Main() {
           ))}
         </div>
       </section>
+
+      {addedDish && (
+        <div
+          className="fixed inset-0 z-[85] bg-black/45 p-4"
+          onClick={() => setAddedDish(null)}
+        >
+          <div
+            className="mx-auto mt-28 w-full max-w-[360px] rounded-2xl bg-white p-5 text-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#FEE2E2] text-[#EF4444]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </div>
+            <p className="text-sm font-semibold text-[#18181B]">
+              {addedDish.name} added to cart
+            </p>
+            <p className="mt-1 text-xs text-[#71717A]">
+              You can update quantity from the order detail panel.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setAddedDish(null)}
+              className="mt-4 w-full rounded-lg bg-[#18181B] px-3 py-2 text-sm font-medium text-white"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

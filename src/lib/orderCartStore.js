@@ -77,6 +77,30 @@ export const addDishToCart = (dish) => {
 
 export const getAdminOrders = () => readJson(ORDER_KEY, []);
 
+export const updateAdminOrderStatus = (orderId, nextStatus) => {
+  const safeOrderId = String(orderId || "").trim();
+  const safeStatus = String(nextStatus || "").trim();
+
+  if (!safeOrderId || !safeStatus) {
+    return { ok: false, message: "Order id and status are required." };
+  }
+
+  const orders = getAdminOrders();
+  const hasTarget = orders.some((order) => order.id === safeOrderId);
+
+  if (!hasTarget) {
+    return { ok: false, message: "Order not found." };
+  }
+
+  const updatedOrders = orders.map((order) =>
+    order.id === safeOrderId ? { ...order, status: safeStatus } : order
+  );
+
+  writeJson(ORDER_KEY, updatedOrders);
+  emitEvent(ORDER_EVENT);
+  return { ok: true, orders: updatedOrders };
+};
+
 export const updateCartItemQuantity = (dishId, nextQuantity) => {
   const current = getCartItems();
   const qty = Number(nextQuantity);
@@ -156,11 +180,20 @@ export const placeOrderFromCart = ({ email, address }) => {
     0
   );
 
+  const orderedItems = cartItems.map((item) => ({
+    _id: item._id,
+    name: item.name,
+    quantity: Number(item.quantity || 0),
+    price: Number(item.price || 0),
+    subtotal: Number(item.price || 0) * Number(item.quantity || 0),
+  }));
+
   orders.unshift({
     id: `order-${Date.now()}`,
     selected: false,
     customer: safeEmail,
     food: itemCount === 1 ? cartItems[0]?.name || "1 food" : `${itemCount} foods`,
+    orderedItems,
     date: `${yyyy}/${mm}/${dd}`,
     total: `$${totalPrice.toFixed(2)}`,
     address: safeAddress,
@@ -169,8 +202,7 @@ export const placeOrderFromCart = ({ email, address }) => {
 
   writeJson(ORDER_KEY, orders);
   emitEvent(ORDER_EVENT);
-  // Keep login email, but clear the address input after successful checkout.
-  setCheckoutInfo({ email: safeEmail, address: "" });
+  setCheckoutInfo({ email: safeEmail, address: safeAddress });
   clearCart();
   return { ok: true };
 };

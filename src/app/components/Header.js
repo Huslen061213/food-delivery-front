@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   getAdminOrders,
+  getCheckoutInfo,
   getCartCount,
   getCartItems,
   placeOrderFromCart,
@@ -36,13 +37,11 @@ export default function Header() {
     const syncState = () => {
       setCartCount(getCartCount());
       setCartItems(getCartItems());
-      setOrderHistory(getAdminOrders());
-      const authEmail =
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("nomnom_user_email") || ""
-          : "";
-      setEmail(authEmail);
-      setAddress((prev) => prev || "");
+      const adminOrders = getAdminOrders();
+      const checkoutInfo = getCheckoutInfo();
+      setOrderHistory(adminOrders);
+      setEmail(checkoutInfo.email);
+      setAddress(checkoutInfo.address);
     };
 
     syncState();
@@ -60,6 +59,8 @@ export default function Header() {
 
   const orderTotal = cartItems.length > 0 ? itemsTotal + SHIPPING_FEE : 0;
   const addressPreview = address.trim() || "Add Location";
+  const latestOrderAddress = orderHistory[0]?.address || "";
+  const deliveryLocation = latestOrderAddress || address.trim() || "No delivery address yet";
 
   const changeQty = (id, diff) => {
     const current = cartItems.find((item) => item._id === id);
@@ -151,8 +152,7 @@ export default function Header() {
       return;
     }
 
-    setCheckoutInfo({ email, address: "" });
-    setAddress("");
+    setCheckoutInfo({ email, address });
     setCheckoutSuccess("Order placed successfully.");
     setActiveTab("order");
     setSuccessOrderOpen(true);
@@ -553,7 +553,7 @@ export default function Header() {
                         <h3 className="mb-3 text-base font-semibold text-[#71717A]">Current delivery</h3>
                         <p className="text-sm text-[#71717A]">Delivery location</p>
                         <p className="mt-1 text-base text-[#18181B]">
-                          {address.trim() || "No delivery address yet"}
+                          {deliveryLocation}
                         </p>
                       </section>
                     </>
