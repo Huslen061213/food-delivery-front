@@ -23,6 +23,7 @@ export const FooodMenu = () => {
   const [openAddCategory, setOpenAddCategory] = useState(false);
   const [openAddDish, setOpenAddDish] = useState(false);
   const [openEditDish, setOpenEditDish] = useState(false);
+  const [addDishCategoryId, setAddDishCategoryId] = useState("");
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -105,6 +106,20 @@ export const FooodMenu = () => {
       : categories.find((category) => category._id === activeCategory)
           ?.categoryName || "Category";
 
+  const addDishCategoryName =
+    categories.find((category) => category._id === addDishCategoryId)?.categoryName ||
+    activeCategoryName;
+
+  const openAddDishDialog = (categoryId) => {
+    const fallbackCategoryId = categories[0]?._id || "";
+    const nextCategoryId =
+      categoryId || (activeCategory !== "all" ? activeCategory : fallbackCategoryId);
+
+    setAddDishCategoryId(nextCategoryId);
+    setDishError("");
+    setOpenAddDish(true);
+  };
+
   const openDishEditor = (dish) => {
     setEditingDishId(dish._id);
     setEditDish({
@@ -151,6 +166,23 @@ export const FooodMenu = () => {
     </div>
   );
 
+  const renderAddDishTile = (categoryId, categoryName) => (
+    <div
+      key={`add-dish-${categoryId}`}
+      onClick={() => openAddDishDialog(categoryId)}
+      className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px] hover:border-red-400 transition cursor-pointer"
+    >
+      <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center mb-4">
+        <Plus className="w-8 h-8" />
+      </div>
+      <p className="text-center text-gray-700 font-medium">
+        Add new Dish to
+        <br />
+        {categoryName}
+      </p>
+    </div>
+  );
+
   const handleAddCategory = async (e) => {
     e.preventDefault();
     const trimmedName = newCategoryName.trim();
@@ -191,8 +223,10 @@ export const FooodMenu = () => {
     const dishName = newDish.name.trim();
     const dishDescription = newDish.description.trim();
     const dishPrice = Number(newDish.price);
+    const targetCategoryId =
+      addDishCategoryId || (activeCategory === "all" ? "" : activeCategory);
 
-    if (activeCategory === "all") {
+    if (!targetCategoryId) {
       setDishError("Please choose a specific category first.");
       return;
     }
@@ -219,7 +253,7 @@ export const FooodMenu = () => {
         price: dishPrice,
         description: dishDescription,
         image: newDish.imagePreview,
-        categoryId: activeCategory,
+        categoryId: targetCategoryId,
       });
 
       setDishes((prev) => [res.data, ...prev]);
@@ -232,6 +266,7 @@ export const FooodMenu = () => {
       });
       setDishError("");
       setOpenAddDish(false);
+      setAddDishCategoryId("");
     } catch (err) {
       setDishError(err?.response?.data?.message || "Failed to add dish.");
     }
@@ -404,6 +439,7 @@ export const FooodMenu = () => {
           onOpenChange={(open) => {
             setOpenAddDish(open);
             if (!open) {
+              setAddDishCategoryId("");
               setNewDish({
                 name: "",
                 price: "",
@@ -418,7 +454,7 @@ export const FooodMenu = () => {
           <DialogContent className="sm:max-w-[460px] h-[620px]">
             <form onSubmit={handleAddDish} className="grid gap-4">
               <DialogHeader>
-                <DialogTitle>Add new Dish to {activeCategoryName}</DialogTitle>
+                <DialogTitle>Add new Dish to {addDishCategoryName}</DialogTitle>
               </DialogHeader>
 
               <div className="grid gap-4">
@@ -619,18 +655,19 @@ export const FooodMenu = () => {
 
                 {groupedDishesByCategory.map((group) => (
                   <div key={group.id}>
-                    <h4 className="text-lg font-bold mb-4">
+                    <h4 className="mb-4 text-lg font-bold">
                       {group.name} ({group.items.length})
                     </h4>
-                    {group.items.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {group.items.map((dish) => renderDishCard(dish))}
-                      </div>
-                    ) : (
-                      <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500">
-                        No dishes in this category yet.
-                      </div>
-                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {renderAddDishTile(group.id, group.name)}
+                      {group.items.length > 0 ? (
+                        group.items.map((dish) => renderDishCard(dish))
+                      ) : (
+                        <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-sm text-gray-500 min-h-[300px] flex items-center">
+                          No dishes in this category yet.
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -641,19 +678,7 @@ export const FooodMenu = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div
-                    onClick={() => setOpenAddDish(true)}
-                    className="border-2 border-dashed border-gray-300 rounded-xl p-8 flex flex-col items-center justify-center min-h-[300px] hover:border-red-400 transition cursor-pointer"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center mb-4">
-                      <Plus className="w-8 h-8" />
-                    </div>
-                    <p className="text-center text-gray-700 font-medium">
-                      Add new Dish to
-                      <br />
-                      {activeCategoryName}
-                    </p>
-                  </div>
+                  {renderAddDishTile(activeCategory, activeCategoryName)}
 
                   {displayDishes.map((dish) => renderDishCard(dish))}
                 </div>

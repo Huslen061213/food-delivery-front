@@ -327,7 +327,7 @@ export default function Header() {
 
           <div className="absolute inset-x-0 bottom-0 top-14 sm:inset-x-auto sm:bottom-4 sm:right-3 sm:top-16 sm:w-[460px]">
             <div className="h-full rounded-t-2xl border border-white/10 bg-[#3F3F46] shadow-2xl sm:rounded-2xl">
-              <div className="flex h-full flex-col p-4">
+              <div className="flex h-full flex-col p-5">
                 <div className="mb-4 flex items-center justify-between px-1 py-2 text-white">
                   <div className="flex items-center gap-2">
                     <svg
@@ -345,12 +345,12 @@ export default function Header() {
                       <circle cx="19" cy="21" r="1" />
                       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.72a2 2 0 0 0 2-1.7L22 6H6" />
                     </svg>
-                    <p className="text-xs font-medium sm:text-sm">Order detail</p>
+                    <p className="text-sm font-medium sm:text-base">Order detail</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setCartOpen(false)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/50 text-lg leading-none text-white/80"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 text-2xl leading-none text-white/80"
                     aria-label="Close cart panel"
                   >
                     ✕
@@ -358,7 +358,7 @@ export default function Header() {
                 </div>
 
                 <div className="mb-4 rounded-full bg-[#E4E4E7] p-1.5 shadow-sm">
-                  <div className="grid grid-cols-2 gap-1.5 text-center text-xs sm:text-sm">
+                  <div className="grid grid-cols-2 gap-1.5 text-center text-sm sm:text-base">
                     <button
                       type="button"
                       onClick={() => setActiveTab("cart")}
@@ -387,13 +387,13 @@ export default function Header() {
                 >
                   {activeTab === "cart" ? (
                     <div className="flex h-full min-h-0 flex-col gap-4">
-                      <section className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-[24px] border border-[#E4E4E7] bg-[#F4F4F5] p-4">
-                        <h3 className="mb-3 text-base font-semibold leading-tight text-[#71717A] sm:text-lg">
+                      <section className="flex min-h-0 flex-1 flex-col overflow-y-auto rounded-[28px] border border-[#E4E4E7] bg-[#F4F4F5] p-5">
+                        <h3 className="mb-3 text-lg font-semibold leading-tight text-[#71717A] sm:text-2xl">
                           My cart
                         </h3>
 
                         {cartItems.length === 0 ? (
-                          <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-[#E4E4E7] bg-[#FAFAFA] text-sm text-[#A1A1AA] sm:h-40">
+                          <div className="flex h-36 items-center justify-center rounded-lg border border-dashed border-[#E4E4E7] bg-[#FAFAFA] text-base text-[#A1A1AA] sm:h-44">
                             Your cart is empty
                           </div>
                         ) : (
@@ -404,7 +404,7 @@ export default function Header() {
                                 className={`pb-4 ${index !== cartItems.length - 1 ? "border-b border-dashed border-[#E4E4E7]" : ""}`}
                               >
                                 <div className="flex gap-4">
-                                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-[#E4E4E7]">
+                                  <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-[#E4E4E7]">
                                     {item.image ? (
                                       <img
                                         src={item.image}
@@ -420,7 +420,7 @@ export default function Header() {
                                         <p className="truncate text-xs font-semibold text-[#EF4444]">
                                           {item.name}
                                         </p>
-                                        <p className="mt-0.5 line-clamp-2 text-[10px] leading-4 text-[#71717A]">
+                                        <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-[#71717A] sm:text-xs">
                                           Fluffy pancake stacked with fruits, cream, syrup, and
                                           powdered sugar.
                                         </p>
@@ -428,14 +428,14 @@ export default function Header() {
                                       <button
                                         type="button"
                                         onClick={() => removeItem(item._id)}
-                                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#F87171] text-base text-[#EF4444]"
+                                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#F87171] text-xl text-[#EF4444]"
                                       >
                                         ✕
                                       </button>
                                     </div>
 
                                     <div className="mt-3 flex items-center justify-between">
-                                      <div className="flex items-center gap-4 text-xs text-[#18181B] sm:text-sm">
+                                      <div className="flex items-center gap-5 text-sm text-[#18181B] sm:text-base">
                                         <button
                                           type="button"
                                           onClick={() => changeQty(item._id, -1)}
@@ -454,7 +454,7 @@ export default function Header() {
                                           +
                                         </button>
                                       </div>
-                                      <p className="text-xs font-semibold text-[#18181B] sm:text-sm">
+                                      <p className="text-sm font-semibold text-[#18181B] sm:text-base">
                                         $
                                         {(
                                           Number(item.price || 0) * Number(item.quantity || 0)
@@ -468,8 +468,8 @@ export default function Header() {
                           </div>
                         )}
 
-                        <div className="mt-4 border-t border-[#E4E4E7] pt-4">
-                          <h4 className="text-sm font-semibold leading-tight text-[#71717A] sm:text-lg">
+                        <div className="mt-5 border-t border-[#E4E4E7] pt-5">
+                          <h4 className="text-base font-semibold leading-tight text-[#71717A] sm:text-2xl">
                             Delivery location
                           </h4>
                           <textarea
@@ -478,16 +478,16 @@ export default function Header() {
                             onBlur={handleSaveCheckoutInfo}
                             rows={3}
                             placeholder="Please share your complete address"
-                            className="mt-2.5 min-h-[74px] w-full resize-none rounded-xl border border-[#D4D4D8] bg-[#F4F4F5] px-3 py-2 text-xs text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none"
+                            className="mt-3 min-h-[84px] w-full resize-none rounded-xl border border-[#D4D4D8] bg-[#F4F4F5] px-3.5 py-2.5 text-sm text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none"
                           />
                         </div>
                       </section>
 
-                      <section className="shrink-0 rounded-[24px] border border-[#E4E4E7] bg-[#F4F4F5] p-4">
-                        <h3 className="mb-3 text-base font-semibold leading-tight text-[#71717A] sm:text-lg">
+                      <section className="shrink-0 rounded-[28px] border border-[#E4E4E7] bg-[#F4F4F5] p-5">
+                        <h3 className="mb-4 text-lg font-semibold leading-tight text-[#71717A] sm:text-2xl">
                           Payment info
                         </h3>
-                        <div className="space-y-2 text-[11px] text-[#71717A] sm:text-xs">
+                        <div className="space-y-2.5 text-xs text-[#71717A] sm:text-sm">
                           <div className="flex items-center justify-between">
                             <span>Items</span>
                             <span className="font-semibold text-[#18181B]">
@@ -501,7 +501,7 @@ export default function Header() {
                             </span>
                           </div>
                           <div className="border-t border-dashed border-[#E4E4E7] pt-2" />
-                          <div className="flex items-center justify-between text-xs sm:text-sm">
+                          <div className="flex items-center justify-between text-sm sm:text-base">
                             <span>Total</span>
                             <span className="font-semibold text-[#18181B]">
                               ${orderTotal.toFixed(2)}
@@ -520,7 +520,7 @@ export default function Header() {
                           type="button"
                           onClick={handleCheckout}
                           disabled={cartItems.length === 0}
-                          className="mt-3 w-full rounded-full bg-[#EF4444] px-4 py-2 text-xs font-medium text-white disabled:opacity-50 sm:py-2.5 sm:text-sm"
+                          className="mt-4 w-full rounded-full bg-[#EF4444] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 sm:py-3"
                         >
                           Checkout
                         </button>
