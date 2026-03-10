@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { addDishToCart } from "@/lib/orderCartStore";
+import {
+  addDishToCart,
+  getCartItems,
+  subscribeOrderCartStore,
+  updateCartItemQuantity,
+} from "@/lib/orderCartStore";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://food-delivery-back-1-wfja.onrender.com";
@@ -55,6 +60,7 @@ export default function Main() {
   const [categories, setCategories] = useState([]);
   const [dishes, setDishes] = useState([]);
   const [addedDish, setAddedDish] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -77,6 +83,15 @@ export default function Main() {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const syncCart = () => {
+      setCartItems(getCartItems());
+    };
+
+    syncCart();
+    return subscribeOrderCartStore(syncCart);
   }, []);
 
   const hasApiData = categories.length > 0 || dishes.length > 0;
@@ -147,6 +162,12 @@ export default function Main() {
     setAddedDish(item);
   };
 
+  const handleDecreaseFromCard = (itemId) => {
+    const current = cartItems.find((cartItem) => cartItem._id === itemId);
+    if (!current) return;
+    updateCartItemQuantity(itemId, Number(current.quantity || 0) - 1);
+  };
+
   const visibleSections =
     activeCategory === "All dishes"
       ? sections
@@ -198,7 +219,11 @@ export default function Main() {
               <h2 className="mb-5 text-2xl font-semibold text-white">{section.title}</h2>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {section.items.map((item, itemIndex) => (
+                {section.items.map((item, itemIndex) => {
+                  const itemInCart = cartItems.find((cartItem) => cartItem._id === item._id);
+                  const quantityInCart = Number(itemInCart?.quantity || 0);
+
+                  return (
                   <article
                     key={item._id || `${item.name}-${itemIndex}`}
                     className="rounded-2xl bg-white p-2 shadow-[0_10px_30px_rgba(0,0,0,0.18)]"
@@ -222,14 +247,36 @@ export default function Main() {
                         </div>
                       )}
 
-                      <button
-                        type="button"
-                        onClick={() => handleAddToCart(item)}
-                        className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-red-500 shadow transition hover:bg-red-500 hover:text-white"
-                        aria-label={`Add ${item.name} to cart`}
-                      >
-                        +
-                      </button>
+                      {quantityInCart > 0 ? (
+                        <div className="absolute bottom-2 right-2 flex items-center gap-3 rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#18181B] shadow">
+                          <button
+                            type="button"
+                            onClick={() => handleDecreaseFromCard(item._id)}
+                            className="text-base leading-none"
+                            aria-label={`Decrease ${item.name} quantity`}
+                          >
+                            -
+                          </button>
+                          <span className="min-w-4 text-center">{quantityInCart}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleAddToCart(item)}
+                            className="text-base leading-none text-red-500"
+                            aria-label={`Increase ${item.name} quantity`}
+                          >
+                            +
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleAddToCart(item)}
+                          className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-red-500 shadow transition hover:bg-red-500 hover:text-white"
+                          aria-label={`Add ${item.name} to cart`}
+                        >
+                          +
+                        </button>
+                      )}
                     </div>
 
                     <div className="px-1 pb-1 pt-3">
@@ -246,7 +293,8 @@ export default function Main() {
                       </p>
                     </div>
                   </article>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ))}

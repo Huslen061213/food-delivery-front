@@ -325,10 +325,10 @@ export default function Header() {
             className="absolute inset-0"
           />
 
-          <div className="absolute inset-x-0 bottom-0 top-14 sm:inset-x-auto sm:right-3 sm:top-16 sm:w-[500px]">
-            <div className="h-full rounded-t-2xl border border-white/10 bg-[#F4F4F5] shadow-2xl sm:h-auto sm:max-h-[82vh] sm:rounded-2xl">
+          <div className="absolute inset-x-0 bottom-0 top-14 sm:inset-x-auto sm:bottom-4 sm:right-3 sm:top-16 sm:w-[500px]">
+            <div className="h-full rounded-t-2xl border border-white/10 bg-[#3F3F46] shadow-2xl sm:rounded-2xl">
               <div className="flex h-full flex-col p-5">
-                <div className="mb-4 flex items-center justify-between rounded-xl bg-[#3F3F46] px-4 py-3.5 text-white">
+                <div className="mb-4 flex items-center justify-between px-1 py-2 text-white">
                   <div className="flex items-center gap-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -345,20 +345,20 @@ export default function Header() {
                       <circle cx="19" cy="21" r="1" />
                       <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.72a2 2 0 0 0 2-1.7L22 6H6" />
                     </svg>
-                    <p className="text-base font-medium">Order detail</p>
+                    <p className="text-sm font-medium sm:text-base">Order detail</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setCartOpen(false)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full text-white/80"
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/50 text-2xl leading-none text-white/80"
                     aria-label="Close cart panel"
                   >
                     ✕
                   </button>
                 </div>
 
-                <div className="mb-4 rounded-full bg-white p-1.5 shadow-sm">
-                  <div className="grid grid-cols-2 gap-1.5 text-center text-base">
+                <div className="mb-4 rounded-full bg-[#E4E4E7] p-1.5 shadow-sm">
+                  <div className="grid grid-cols-2 gap-1.5 text-center text-sm sm:text-base">
                     <button
                       type="button"
                       onClick={() => setActiveTab("cart")}
@@ -380,18 +380,24 @@ export default function Header() {
                   </div>
                 </div>
 
-                <div className="flex-1 space-y-4 overflow-y-auto pb-2">
+                <div
+                  className={`flex-1 min-h-0 pb-2 ${
+                    activeTab === "cart" ? "overflow-hidden" : "space-y-4 overflow-y-auto"
+                  }`}
+                >
                   {activeTab === "cart" ? (
-                    <>
-                      <section className="rounded-xl border border-[#E4E4E7] bg-white p-5">
-                        <h3 className="mb-3 text-base font-semibold text-[#71717A]">My cart</h3>
+                    <div className="flex h-full min-h-0 flex-col gap-4">
+                      <section className="flex min-h-0 flex-1 flex-col rounded-[28px] border border-[#E4E4E7] bg-[#F4F4F5] p-5">
+                        <h3 className="mb-3 text-lg font-semibold leading-tight text-[#71717A] sm:text-2xl">
+                          My cart
+                        </h3>
 
                         {cartItems.length === 0 ? (
-                          <div className="flex h-52 items-center justify-center rounded-lg border border-dashed border-[#E4E4E7] bg-[#FAFAFA] text-base text-[#A1A1AA]">
+                          <div className="flex min-h-[220px] flex-1 items-center justify-center rounded-lg border border-dashed border-[#E4E4E7] bg-[#FAFAFA] text-base text-[#A1A1AA]">
                             Your cart is empty
                           </div>
                         ) : (
-                          <div className="space-y-3">
+                          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
                             {cartItems.map((item, index) => (
                               <div
                                 key={item._id}
@@ -411,10 +417,10 @@ export default function Header() {
                                   <div className="min-w-0 flex-1">
                                     <div className="flex items-start justify-between gap-2">
                                       <div className="min-w-0">
-                                        <p className="truncate text-sm font-semibold text-[#EF4444]">
+                                        <p className="truncate text-xs font-semibold text-[#EF4444] sm:text-sm">
                                           {item.name}
                                         </p>
-                                        <p className="mt-0.5 line-clamp-2 text-xs leading-4 text-[#71717A]">
+                                        <p className="mt-0.5 line-clamp-2 text-[11px] leading-4 text-[#71717A] sm:text-xs">
                                           Fluffy pancake stacked with fruits, cream, syrup, and
                                           powdered sugar.
                                         </p>
@@ -422,14 +428,14 @@ export default function Header() {
                                       <button
                                         type="button"
                                         onClick={() => removeItem(item._id)}
-                                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[#FCA5A5] text-sm text-[#EF4444]"
+                                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#F87171] text-xl text-[#EF4444]"
                                       >
                                         ✕
                                       </button>
                                     </div>
 
                                     <div className="mt-3 flex items-center justify-between">
-                                      <div className="flex items-center gap-5 text-base text-[#18181B]">
+                                      <div className="flex items-center gap-5 text-sm text-[#18181B] sm:text-base">
                                         <button
                                           type="button"
                                           onClick={() => changeQty(item._id, -1)}
@@ -448,7 +454,7 @@ export default function Header() {
                                           +
                                         </button>
                                       </div>
-                                      <p className="text-base font-semibold text-[#18181B]">
+                                      <p className="text-sm font-semibold text-[#18181B] sm:text-base">
                                         $
                                         {(
                                           Number(item.price || 0) * Number(item.quantity || 0)
@@ -461,11 +467,27 @@ export default function Header() {
                             ))}
                           </div>
                         )}
+
+                        <div className="mt-5 border-t border-[#E4E4E7] pt-5">
+                          <h4 className="text-base font-semibold leading-tight text-[#71717A] sm:text-2xl">
+                            Delivery location
+                          </h4>
+                          <textarea
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            onBlur={handleSaveCheckoutInfo}
+                            rows={3}
+                            placeholder="Please share your complete address"
+                            className="mt-3 min-h-[96px] w-full rounded-xl border border-[#D4D4D8] bg-[#F4F4F5] px-3.5 py-2.5 text-sm text-[#18181B] placeholder:text-[#A1A1AA] focus:outline-none"
+                          />
+                        </div>
                       </section>
 
-                      <section className="rounded-xl border border-[#E4E4E7] bg-white p-5">
-                        <h3 className="mb-3 text-base font-semibold text-[#71717A]">Payment info</h3>
-                        <div className="space-y-2.5 text-sm text-[#71717A]">
+                      <section className="shrink-0 rounded-[28px] border border-[#E4E4E7] bg-[#F4F4F5] p-5">
+                        <h3 className="mb-4 text-lg font-semibold leading-tight text-[#71717A] sm:text-2xl">
+                          Payment info
+                        </h3>
+                        <div className="space-y-2.5 text-xs text-[#71717A] sm:text-sm">
                           <div className="flex items-center justify-between">
                             <span>Items</span>
                             <span className="font-semibold text-[#18181B]">
@@ -479,7 +501,7 @@ export default function Header() {
                             </span>
                           </div>
                           <div className="border-t border-dashed border-[#E4E4E7] pt-2" />
-                          <div className="flex items-center justify-between text-base">
+                          <div className="flex items-center justify-between text-sm sm:text-base">
                             <span>Total</span>
                             <span className="font-semibold text-[#18181B]">
                               ${orderTotal.toFixed(2)}
@@ -498,12 +520,12 @@ export default function Header() {
                           type="button"
                           onClick={handleCheckout}
                           disabled={cartItems.length === 0}
-                          className="mt-4 w-full rounded-full bg-[#EF4444] px-4 py-3.5 text-base font-medium text-white disabled:opacity-50"
+                          className="mt-4 w-full rounded-full bg-[#EF4444] px-4 py-2.5 text-sm font-medium text-white disabled:opacity-50 sm:py-3"
                         >
                           Checkout
                         </button>
                       </section>
-                    </>
+                    </div>
                   ) : (
                     <>
                       <section className="rounded-xl border border-[#E4E4E7] bg-white p-5">
