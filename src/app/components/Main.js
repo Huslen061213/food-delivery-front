@@ -59,7 +59,8 @@ export default function Main() {
   const [activeCategory, setActiveCategory] = useState("All dishes");
   const [categories, setCategories] = useState([]);
   const [dishes, setDishes] = useState([]);
-  const [addedDish, setAddedDish] = useState(null);
+  const [quickAddDish, setQuickAddDish] = useState(null);
+  const [quickAddQty, setQuickAddQty] = useState(1);
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
@@ -159,7 +160,27 @@ export default function Main() {
 
   const handleAddToCart = (item) => {
     addDishToCart(item);
-    setAddedDish(item);
+  };
+
+  const openQuickAddModal = (item) => {
+    setQuickAddDish(item);
+    setQuickAddQty(1);
+  };
+
+  const closeQuickAddModal = () => {
+    setQuickAddDish(null);
+    setQuickAddQty(1);
+  };
+
+  const handleQuickAdd = () => {
+    if (!quickAddDish) return;
+    const qty = Math.max(1, Number(quickAddQty || 1));
+
+    for (let i = 0; i < qty; i += 1) {
+      addDishToCart(quickAddDish);
+    }
+
+    closeQuickAddModal();
   };
 
   const handleDecreaseFromCard = (itemId) => {
@@ -270,7 +291,7 @@ export default function Main() {
                       ) : (
                         <button
                           type="button"
-                          onClick={() => handleAddToCart(item)}
+                          onClick={() => openQuickAddModal(item)}
                           className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-white text-red-500 shadow transition hover:bg-red-500 hover:text-white"
                           aria-label={`Add ${item.name} to cart`}
                         >
@@ -301,44 +322,89 @@ export default function Main() {
         </div>
       </section>
 
-      {addedDish && (
+      {quickAddDish && (
         <div
           className="fixed inset-0 z-[85] bg-black/45 p-4"
-          onClick={() => setAddedDish(null)}
+          onClick={closeQuickAddModal}
         >
           <div
-            className="mx-auto mt-28 w-full max-w-[360px] rounded-2xl bg-white p-5 text-center shadow-2xl"
+            className="mx-auto mt-10 w-full max-w-[820px] rounded-2xl bg-white p-4 shadow-2xl sm:mt-14 sm:p-5"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#FEE2E2] text-[#EF4444]">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M20 6 9 17l-5-5" />
-              </svg>
-            </div>
-            <p className="text-sm font-semibold text-[#18181B]">
-              {addedDish.name} added to cart
-            </p>
-            <p className="mt-1 text-xs text-[#71717A]">
-              You can update quantity from the order detail panel.
-            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="h-[240px] overflow-hidden rounded-xl bg-[#E4E4E7] md:h-[330px]">
+                {quickAddDish.image ? (
+                  <img
+                    src={quickAddDish.image}
+                    alt={quickAddDish.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-[linear-gradient(135deg,#cf7d4f_0%,#f6dca8_45%,#8e5537_100%)]" />
+                )}
+              </div>
 
-            <button
-              type="button"
-              onClick={() => setAddedDish(null)}
-              className="mt-4 w-full rounded-lg bg-[#18181B] px-3 py-2 text-sm font-medium text-white"
-            >
-              Close
-            </button>
+              <div className="flex flex-col rounded-xl border border-[#E4E4E7] bg-[#F4F4F5] p-4">
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={closeQuickAddModal}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#D4D4D8] text-xl leading-none text-[#71717A]"
+                    aria-label="Close add to cart modal"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <h3 className="mt-1 text-2xl font-semibold text-[#EF4444] sm:text-3xl">
+                  {quickAddDish.name}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-[#18181B] sm:text-base sm:leading-7">
+                  {quickAddDish.description || "No description"}
+                </p>
+
+                <div className="mt-auto">
+                  <div className="mb-4 flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-sm text-[#18181B] sm:text-base">Total price</p>
+                      <p className="text-2xl font-semibold text-[#18181B] sm:text-3xl">
+                        ${(Number(quickAddDish.price || 0) * quickAddQty).toFixed(2)}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setQuickAddQty((prev) => Math.max(1, prev - 1))}
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-[#D4D4D8] text-2xl leading-none text-[#18181B]"
+                        aria-label="Decrease selected quantity"
+                      >
+                        -
+                      </button>
+                      <span className="min-w-6 text-center text-xl font-medium text-[#18181B] sm:text-2xl">
+                        {quickAddQty}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setQuickAddQty((prev) => Math.min(99, prev + 1))}
+                        className="flex h-10 w-10 items-center justify-center rounded-full border border-[#18181B] text-2xl leading-none text-[#18181B]"
+                        aria-label="Increase selected quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleQuickAdd}
+                    className="w-full rounded-full bg-[#18181B] px-4 py-2.5 text-sm font-medium text-white sm:text-base"
+                  >
+                    Add to cart
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
